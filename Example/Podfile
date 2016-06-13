@@ -1,0 +1,11 @@
+use_frameworks!
+
+target 'MoreOperationView_Example' do
+  pod 'MoreOperationView', :path => '../'
+
+  target 'MoreOperationView_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
