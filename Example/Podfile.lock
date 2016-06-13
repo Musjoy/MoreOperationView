@@ -1,0 +1,19 @@
+PODS:
+  - ModuleCapability (0.1.2)
+  - MoreOperationView (0.1.0):
+    - ModuleCapability (~> 0.1.2)
+
+DEPENDENCIES:
+  - MoreOperationView (from `../`)
+
+EXTERNAL SOURCES:
+  MoreOperationView:
+    :path: ../
+
+SPEC CHECKSUMS:
+  ModuleCapability: 35cea7154ff855362682e90ecf1be529a533c931
+  MoreOperationView: 891f1c94f43f532ea6018dec3a83be4dd603c7b2
+
+PODFILE CHECKSUM: 894a394b2e55972cf6e49f3770b23b4b5eb80bf5
+
+COCOAPODS: 1.0.1
