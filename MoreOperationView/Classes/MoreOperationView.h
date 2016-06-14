@@ -20,7 +20,7 @@
 
 // 可配置项
 @property (nonatomic, strong) UIColor *bgColor;         ///< 背景色，默认白色
-@property (nonatomic, strong) UIColor *borderColor;     ///< 边框颜色，默认为nil
+@property (nonatomic, strong) UIColor *borderColor;     ///< 边框颜色，默认为[UIColor lightGrayColor]
 @property (nonatomic, assign) CGFloat *borderWitdh;     ///< 边框大小，默认为0.5
 @property (nonatomic, assign) CGFloat hPadding;         ///< 水平方向偏移，默认0
 @property (nonatomic, assign) CGFloat vPadding;         ///< 垂直方向偏移，默认0

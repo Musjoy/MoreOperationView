@@ -66,6 +66,7 @@
     _hPadding = 0;
     _vPadding = 0;
     _bgColor = [UIColor whiteColor];
+    _borderColor = [UIColor lightGrayColor];
     self.contentMode = UIViewContentModeTopRight;
     self.hidden = YES;
 }
@@ -91,6 +92,23 @@
 }
 
 
+- (void)setSourceView:(UIView *)sourceView
+{
+    if (_sourceView = sourceView) {
+        return;
+    }
+    _sourceView = sourceView;
+    [self relocateContentView];
+}
+
+#pragma mark - Overwrite
+
+- (void)didMoveToSuperview
+{
+    [super didMoveToSuperview];
+    [self relocateContentView];
+}
+
 #pragma mark - Action
 
 - (void)buttonClick:(UIButton *)aBtn
@@ -98,6 +116,7 @@
     if (_delegate && [_delegate respondsToSelector:@selector(operationClickWithTag:)]) {
         [_delegate operationClickWithTag:aBtn.tag];
     }
+    [self hide];
 }
 
 - (void)tapBlank
@@ -113,6 +132,7 @@
         _viewContent = [[UIView alloc] init];
         _viewContent.backgroundColor = [UIColor clearColor];
         [_viewContent setTranslatesAutoresizingMaskIntoConstraints:NO];
+        [_viewContent setClipsToBounds:YES];
         [self addSubview:_viewContent];
         [self relocateContentView];
         
@@ -124,14 +144,14 @@
         if (_borderColor) {
             _viewBtns.layer.borderColor = _borderColor.CGColor;
             _viewBtns.layer.borderWidth = 0.5;
-            padding = 0.5;
+            padding = 1;
         }
         [_viewBtns setTranslatesAutoresizingMaskIntoConstraints:NO];
         [_viewContent addSubview:_viewBtns];
         
         // 水平方向
-        _lytLeft = [NSLayoutConstraint constraintWithItem:_viewBtns attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:_viewContent attribute:NSLayoutAttributeLeading multiplier:1 constant:padding];
-        _lytRight = [NSLayoutConstraint constraintWithItem:_viewBtns attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:_viewContent attribute:NSLayoutAttributeTrailing multiplier:1 constant:padding];
+        _lytLeft = [NSLayoutConstraint constraintWithItem:_viewBtns attribute:NSLayoutAttributeLeading relatedBy:NSLayoutRelationEqual toItem:_viewContent attribute:NSLayoutAttributeLeading multiplier:1 constant:0];
+        _lytRight = [NSLayoutConstraint constraintWithItem:_viewBtns attribute:NSLayoutAttributeTrailing relatedBy:NSLayoutRelationEqual toItem:_viewContent attribute:NSLayoutAttributeTrailing multiplier:1 constant:0];
         
         // 创建垂直依赖
         _lytTop = [NSLayoutConstraint constraintWithItem:_viewBtns attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:_viewContent attribute:NSLayoutAttributeTop multiplier:1 constant:padding];
@@ -140,15 +160,16 @@
             || self.contentMode == UIViewContentModeTopRight
             || self.contentMode == UIViewContentModeTop) {
             _lytMove = [NSLayoutConstraint constraintWithItem:_viewBtns attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:_viewContent attribute:NSLayoutAttributeTop multiplier:1 constant:padding];
+            _lytTop.constant = -padding;
         } else {
             _lytMove = [NSLayoutConstraint constraintWithItem:_viewBtns attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:_viewContent attribute:NSLayoutAttributeBottom multiplier:1 constant:padding];
         }
         
         // 添加大小约束
-        NSLayoutConstraint *lytWidth = [NSLayoutConstraint constraintWithItem:_viewBtns attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:_viewContent attribute:NSLayoutAttributeWidth multiplier:1 constant:0];
+//        NSLayoutConstraint *lytWidth = [NSLayoutConstraint constraintWithItem:_viewBtns attribute:NSLayoutAttributeWidth relatedBy:NSLayoutRelationEqual toItem:_viewContent attribute:NSLayoutAttributeWidth multiplier:1 constant:0];
         NSLayoutConstraint *lytHeight = [NSLayoutConstraint constraintWithItem:_viewBtns attribute:NSLayoutAttributeHeight relatedBy:NSLayoutRelationEqual toItem:_viewContent attribute:NSLayoutAttributeHeight multiplier:1 constant:0];
         
-        [_viewContent addConstraints:@[_lytLeft, _lytRight, _lytTop, lytWidth, lytHeight]];
+        [_viewContent addConstraints:@[_lytLeft, _lytRight, _lytTop, lytHeight]];
         
     } else {
         for (UIView *aView in _viewBtns.subviews) {
@@ -296,11 +317,14 @@
 - (void)relocateContentView
 {
     UIView *superView = self.superview;
+    if (superView == nil) {
+        return;
+    }
     if (_lytH) {
         if ([self.constraints containsObject:_lytH]) {
             [self removeConstraint:_lytH];
         } else {
-            if (superView && [superView.constraints containsObject:_lytH]) {
+            if ([superView.constraints containsObject:_lytH]) {
                 [superView removeConstraint:_lytH];
             }
         }
@@ -310,7 +334,7 @@
         if ([self.constraints containsObject:_lytV]) {
             [self removeConstraint:_lytV];
         } else {
-            if (superView && [superView.constraints containsObject:_lytV]) {
+            if ([superView.constraints containsObject:_lytV]) {
                 [superView removeConstraint:_lytV];
             }
         }
@@ -333,7 +357,7 @@
         _lytH = [NSLayoutConstraint constraintWithItem:_viewContent attribute:NSLayoutAttributeLeft relatedBy:NSLayoutRelationEqual toItem:relyView attribute:NSLayoutAttributeLeft multiplier:1 constant:_hPadding];
     } else if (self.contentMode == UIViewContentModeTopRight
                || self.contentMode == UIViewContentModeBottomRight) {
-        _lytH = [NSLayoutConstraint constraintWithItem:_viewContent attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:relyView attribute:NSLayoutAttributeRight multiplier:1 constant:_hPadding];
+        _lytH = [NSLayoutConstraint constraintWithItem:_viewContent attribute:NSLayoutAttributeRight relatedBy:NSLayoutRelationEqual toItem:relyView attribute:NSLayoutAttributeRight multiplier:1 constant:isReverse?(-_hPadding):_hPadding];
     } else {
         _lytH = [NSLayoutConstraint constraintWithItem:_viewContent attribute:NSLayoutAttributeCenterX relatedBy:NSLayoutRelationEqual toItem:relyView attribute:NSLayoutAttributeCenterX multiplier:1 constant:_hPadding];
     }
@@ -344,9 +368,9 @@
         || self.contentMode == UIViewContentModeTopRight
         || self.contentMode == UIViewContentModeTop) {
         // 左对齐
-        _lytV = [NSLayoutConstraint constraintWithItem:_viewContent attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:relyView attribute:isReverse?NSLayoutAttributeBottom:NSLayoutAttributeTop multiplier:1 constant:_hPadding];
+        _lytV = [NSLayoutConstraint constraintWithItem:_viewContent attribute:NSLayoutAttributeTop relatedBy:NSLayoutRelationEqual toItem:relyView attribute:isReverse?NSLayoutAttributeBottom:NSLayoutAttributeTop multiplier:1 constant:_vPadding];
     } else {
-        _lytV = [NSLayoutConstraint constraintWithItem:_viewContent attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:relyView attribute:isReverse?NSLayoutAttributeTop:NSLayoutAttributeBottom multiplier:1 constant:_hPadding];
+        _lytV = [NSLayoutConstraint constraintWithItem:_viewContent attribute:NSLayoutAttributeBottom relatedBy:NSLayoutRelationEqual toItem:relyView attribute:isReverse?NSLayoutAttributeTop:NSLayoutAttributeBottom multiplier:1 constant:_vPadding];
     }
     [containerView addConstraint:_lytV];
     
@@ -355,7 +379,7 @@
 
 - (UIButton *)createButtonWith:(NSDictionary *)aDic
 {
-    UIButton *aBtn = [UIButton buttonWithType:UIButtonTypeCustom];
+    UIButton *aBtn = [UIButton buttonWithType:UIButtonTypeSystem];
     [aBtn.titleLabel setFont:[UIFont systemFontOfSize:16]];
     [aBtn setTitleColor:self.tintColor forState:UIControlStateNormal];
 //    [aBtn setBackgroundImage:[UIImage createImageWithColor:kAppActiveColor] forState:UIControlStateHighlighted];
