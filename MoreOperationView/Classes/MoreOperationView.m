@@ -68,6 +68,8 @@
     _bgColor = [UIColor whiteColor];
     _borderColor = [UIColor lightGrayColor];
     self.contentMode = UIViewContentModeTopRight;
+    _minWidth = 60;
+    _textAlign = UIControlContentHorizontalAlignmentLeft;
     self.hidden = YES;
 }
 
@@ -214,7 +216,8 @@
             lineHeight = 0;
         }
         NSNumber *theLineHeight = [NSNumber numberWithFloat:lineHeight];
-        NSDictionary *dicMetric = NSDictionaryOfVariableBindings(theLineHeight);
+        NSNumber *minWidth = [NSNumber numberWithFloat:_minWidth];
+        NSDictionary *dicMetric = NSDictionaryOfVariableBindings(theLineHeight, minWidth);
         
         // viewLine水平边距vfl
         NSString *vfl = @"H:|[viewLine]|";
@@ -222,8 +225,8 @@
         [_viewBtns addConstraints:hConstraintd];
         
         // 水平边距vfl
-        NSString *vfl1 = @"H:|[aBtn]|";
-        NSArray *hConstraintd1 =[NSLayoutConstraint constraintsWithVisualFormat:vfl1 options:0 metrics:nil views:dicViews];
+        NSString *vfl1 = @"H:|[aBtn(>=minWidth)]|";
+        NSArray *hConstraintd1 =[NSLayoutConstraint constraintsWithVisualFormat:vfl1 options:0 metrics:dicMetric views:dicViews];
         [_viewBtns addConstraints:hConstraintd1];
         
         // 垂直边距vfl
@@ -383,7 +386,7 @@
     [aBtn.titleLabel setFont:[UIFont systemFontOfSize:16]];
     [aBtn setTitleColor:self.tintColor forState:UIControlStateNormal];
 //    [aBtn setBackgroundImage:[UIImage createImageWithColor:kAppActiveColor] forState:UIControlStateHighlighted];
-    [aBtn setContentHorizontalAlignment:UIControlContentHorizontalAlignmentLeft];
+    [aBtn setContentHorizontalAlignment:_textAlign];
     [aBtn setTranslatesAutoresizingMaskIntoConstraints:NO];
     [aBtn addTarget:self action:@selector(buttonClick:) forControlEvents:UIControlEventTouchUpInside];
     NSString *icon = aDic[@"icon"];

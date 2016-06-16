@@ -25,6 +25,9 @@
 @property (nonatomic, assign) CGFloat hPadding;         ///< 水平方向偏移，默认0
 @property (nonatomic, assign) CGFloat vPadding;         ///< 垂直方向偏移，默认0
 @property (nonatomic, strong) UIView *sourceView;       ///< 依赖的View，默认为nil
+// btn
+@property (nonatomic, assign) CGFloat minWidth;         ///< 最小宽度，默认60
+@property (nonatomic, assign) UIControlContentHorizontalAlignment textAlign;    ///< 最小宽度，默认UIControlContentHorizontalAlignmentLeft
 
 @property (nonatomic, assign) id<MoreOperationDelegate> delegate;
 
