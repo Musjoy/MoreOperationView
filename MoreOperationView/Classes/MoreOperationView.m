@@ -96,7 +96,7 @@
 
 - (void)setSourceView:(UIView *)sourceView
 {
-    if (_sourceView = sourceView) {
+    if (_sourceView == sourceView) {
         return;
     }
     _sourceView = sourceView;
