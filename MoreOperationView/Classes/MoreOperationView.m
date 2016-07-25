@@ -7,7 +7,9 @@
 //
 
 #import "MoreOperationView.h"
-
+#ifdef MODULE_THEME_MANAGER
+#import "MJThemeManager.h"
+#endif
 
 #define TOP_PADDING 0
 #define RIGHT_PADDING 10
@@ -17,6 +19,8 @@
 @property (nonatomic, strong) UIView *viewBg;
 @property (nonatomic, strong) UIView *viewContent;
 @property (nonatomic, strong) UIView *viewBtns;
+
+@property (nonatomic, strong) NSMutableArray *arrViewLines;
 
 // viewContent约束
 @property (nonatomic, strong) NSLayoutConstraint *lytH;
@@ -65,8 +69,14 @@
     _isHide = YES;
     _hPadding = 0;
     _vPadding = 0;
+#ifdef MODULE_THEME_MANAGER
+    [self reloadTheme];
+#else
     _bgColor = [UIColor whiteColor];
     _borderColor = [UIColor lightGrayColor];
+    _separatorColor = [UIColor lightGrayColor];
+#endif
+    _arrViewLines  = [[NSMutableArray alloc] init];
     self.contentMode = UIViewContentModeTopRight;
     _minWidth = 60;
     _textAlign = UIControlContentHorizontalAlignmentLeft;
@@ -93,6 +103,30 @@
     }
 }
 
+- (void)setBgColor:(UIColor *)bgColor
+{
+#ifndef MODULE_THEME_MANAGER
+    _bgColor = bgColor;
+#endif
+}
+
+- (void)setBorderColor:(UIColor *)borderColor
+{
+#ifndef MODULE_THEME_MANAGER
+    _borderColor = borderColor;
+    if (_viewBtns) {
+        _viewBtns.layer.borderColor = _borderColor.CGColor;
+    }
+#endif
+}
+
+- (void)setSeparatorColor:(UIColor *)separatorColor
+{
+    _separatorColor = separatorColor;
+    for (UIView *viewLine in _arrViewLines) {
+        [viewLine setBackgroundColor:separatorColor];
+    }
+}
 
 - (void)setSourceView:(UIView *)sourceView
 {
@@ -109,6 +143,21 @@
 {
     [super didMoveToSuperview];
     [self relocateContentView];
+}
+
+- (void)reloadTheme
+{
+    [super reloadTheme];
+    _bgColor = [MJThemeManager colorFor:kThemeHeaderBgColor];
+    if (_viewBtns) {
+        _viewBtns.backgroundColor = _bgColor;
+    }
+    UIColor *lineColor = [MJThemeManager colorFor:kThemeCellLineColor];
+    [self setSeparatorColor:lineColor];
+    _borderColor = lineColor;
+    if (_viewBtns) {
+        _viewBtns.layer.borderColor = _borderColor.CGColor;
+    }
 }
 
 #pragma mark - Action
@@ -177,6 +226,7 @@
         for (UIView *aView in _viewBtns.subviews) {
             [aView removeFromSuperview];
         }
+        [_arrViewLines removeAllObjects];
     }
 
     // 在_viewBtns左上角添加参照view，便于btn排版
@@ -207,7 +257,8 @@
         
         // 添加一分割条线
         UIView *viewLine = [[UIView alloc] init];
-        [viewLine setBackgroundColor:[UIColor lightGrayColor]];
+        [_arrViewLines addObject:viewLine];
+        [viewLine setBackgroundColor:_separatorColor];
         [viewLine setTranslatesAutoresizingMaskIntoConstraints:NO];
         [_viewBtns addSubview:viewLine];
         NSDictionary *dicViews = NSDictionaryOfVariableBindings(aBtn, topView, viewLine);
