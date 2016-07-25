@@ -341,11 +341,6 @@
 
 - (void)hide
 {
-    [self hideForce:NO];
-}
-
-- (void)hideForce:(BOOL)isForce
-{
     if (self.superview == nil) {
         return;
     }
@@ -360,7 +355,7 @@
         [_viewBg setAlpha:0];
         [self layoutIfNeeded];
     } completion:^(BOOL finished) {
-        if (finished || isForce) {
+        if (finished || _isHide) {
             self.hidden = YES;
         }
     }];
