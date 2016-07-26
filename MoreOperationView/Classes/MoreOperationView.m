@@ -430,7 +430,7 @@
 {
     UIButton *aBtn = [UIButton buttonWithType:UIButtonTypeSystem];
     [aBtn.titleLabel setFont:[UIFont systemFontOfSize:16]];
-    [aBtn setTitleColor:self.tintColor forState:UIControlStateNormal];
+//    [aBtn setTitleColor:self.tintColor forState:UIControlStateNormal];
 //    [aBtn setBackgroundImage:[UIImage createImageWithColor:kAppActiveColor] forState:UIControlStateHighlighted];
     [aBtn setContentHorizontalAlignment:_textAlign];
     [aBtn setTranslatesAutoresizingMaskIntoConstraints:NO];
