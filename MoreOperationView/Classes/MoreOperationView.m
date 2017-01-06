@@ -145,6 +145,7 @@
     [self relocateContentView];
 }
 
+#ifdef MODULE_THEME_MANAGER
 - (void)reloadTheme
 {
     [super reloadTheme];
@@ -159,6 +160,7 @@
         _viewBtns.layer.borderColor = _borderColor.CGColor;
     }
 }
+#endif
 
 #pragma mark - Action
 
