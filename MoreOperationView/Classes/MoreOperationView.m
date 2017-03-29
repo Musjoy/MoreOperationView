@@ -48,6 +48,7 @@
 
 - (void)awakeFromNib
 {
+    [super awakeFromNib];
     [self settingView];
 }
 
@@ -361,6 +362,24 @@
             self.hidden = YES;
         }
     }];
+}
+
+- (void)hideForce:(BOOL)isForce
+{
+    if (!isForce) {
+        [self hide];
+        return;
+    }
+    if (self.superview == nil) {
+        return;
+    }
+    if (_isHide) {
+        return;
+    }
+    [_viewContent addConstraint:_lytMove];
+    [_viewBg setAlpha:0];
+    [self layoutIfNeeded];
+    self.hidden = YES;
 }
 
 #pragma mark - Private
